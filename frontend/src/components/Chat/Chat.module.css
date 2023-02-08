@@ -1,0 +1,59 @@
+.users {
+  background: white;
+  padding: 20px;
+  /* border: 5px solid black; */
+  margin: 10px;
+  display: inline-block;
+  width: 100%;
+  margin: 2% 3% 1% 3%;
+  text-align: center;
+}
+
+.users h3 {
+  font-size: 23px;
+  font-weight: bold;
+}
+
+.select {
+  display: inline-block;
+  width: 50%;
+  margin: 0;
+}
+.users button {
+  cursor: pointer;
+  color: whitesmoke;
+  font-size: 15px;
+  background: #3e40a3b9;
+  border: 1px solid #5c5858;
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  margin: 0 11% 11% 11%;
+  width: 50%;
+  height: 35px;
+}
+.control {
+  margin-bottom: 0.5rem;
+}
+
+.control label {
+  display: block;
+  color: rgb(37, 34, 34);
+  font-weight: bold;
+  font-size: 14px;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+.control input {
+  display: block;
+  width: 20rem;
+  margin: auto;
+  border-radius: 4px;
+  padding: 0.25rem;
+  border: 1px solid #ccc;
+}
+
+.login-buttons {
+  display: flex;
+  justify-content: center;
+}

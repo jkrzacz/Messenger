@@ -1,5 +1,6 @@
+from typing import Optional
+
 from fastapi import FastAPI, status, HTTPException, Depends
-from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.responses import RedirectResponse
 from Auth.schemas import UserAuth, TokenSchema
 from Auth.utils import (
@@ -14,6 +15,7 @@ from Services.ChatService import ChatService
 from Services.MessageService import MessageService
 from Services.ChatReaderService import ChatReaderService
 from Services.MessageReaderService import MessageReaderService
+from Services.FacebookService import FacebookService
 
 from Models.User import User, SystemUser
 from Models.Chat import CreateChat, Chat
@@ -41,36 +43,45 @@ async def docs():
 @app.post('/signup', summary="Create new user", response_model=User)
 async def create_user(data: UserAuth):
     userService = UserService()
-    user = userService.get_user_for_email(data.email)
+    user = userService.get_user_for_name(data.name)
     if user is not None:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="User with this email already exist"
+            detail="User with this name already exist"
         )
 
     is_admin = False
     password = get_hashed_password(data.password)
-    user = userService.add_user(is_admin,data.email,password)
+    user = userService.add_user(is_admin,data.name,password, None)
     return user
 
 @app.post('/login', summary="Create access and refresh tokens for user", response_model=TokenSchema)
-async def login(form_data: OAuth2PasswordRequestForm = Depends()):
-    userService = UserService()
-    user = userService.get_user_for_email(form_data.username)
-    if user is None:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Incorrect email or password"
-        )
+async def login(username: str, fb_token: Optional[str] = None, password: Optional[str] = None):
+#async def login(form_data: OAuth2PasswordRequestForm = Depends()):
+    if not (fb_token is None):
+        user = FacebookService().get_user_for_token(username, fb_token)
+        if user is None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Incorrect name or fb_token"
+            )
 
-    hashed_pass = user.password
-    if not verify_password(form_data.password, hashed_pass):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Incorrect email or password"
-        )
+    if fb_token is None:
+        user = UserService().get_user_for_name(username)
+        if user is None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Incorrect name or password"
+            )
 
-    return TokenSchema(access_token=create_access_token(user.email), refresh_token=create_refresh_token(user.email))
+        hashed_pass = user.password
+        if not verify_password(password, hashed_pass):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Incorrect name or password"
+            )
+
+    return TokenSchema(access_token=create_access_token(user.name), refresh_token=create_refresh_token(user.name))
 
 @app.get('/me', summary='Get details of currently logged in user', response_model=User)
 async def get_me(user: SystemUser = Depends(get_current_user)):
@@ -96,6 +107,21 @@ async def change_admin(user_id: int, is_admin: bool, user: SystemUser = Depends(
 
     return UserService().change_admin(user_id,is_admin)
 
+@app.delete('/user', summary="Delete user")
+async def delete_user(user_id: int, user: SystemUser = Depends(get_current_user)):
+    if user.is_admin == False:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="You are not admin"
+        )
+
+    if user.id == user_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="You can not delete yourself"
+        )
+
+    return UserService().delete_user(user_id)
 
 @app.post('/chat', summary="Create new chat", response_model=Chat)
 async def create_chat(data: CreateChat, user: SystemUser = Depends(get_current_user)):

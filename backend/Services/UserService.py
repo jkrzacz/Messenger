@@ -8,8 +8,8 @@ class UserService:
         conn = DBManager().conn
         c = conn.cursor()
         result = []
-        for row in c.execute('SELECT ID, IS_ADMIN, EMAIL FROM USER ORDER BY ID'):
-            result.append(User(id=int(row[0]), is_admin=bool(row[1]), email=str(row[2])))
+        for row in c.execute('SELECT ID, IS_ADMIN, NAME FROM USER ORDER BY ID'):
+            result.append(User(id=int(row[0]), is_admin=bool(row[1]), name=str(row[2])))
 
         c.close()
 
@@ -19,18 +19,18 @@ class UserService:
         conn = DBManager().conn
         c = conn.cursor()
         result = None
-        for row in c.execute("SELECT ID, IS_ADMIN, EMAIL, PASSWORD FROM USER WHERE ID = ? ORDER BY ID", [id]):
-            result = SystemUser(id=int(row[0]), is_admin=bool(row[1]), email=str(row[2]), password=str(row[3]))
+        for row in c.execute("SELECT ID, IS_ADMIN, NAME, PASSWORD, FB_ID FROM USER WHERE ID = ? ORDER BY ID", [id]):
+            result = SystemUser(id=int(row[0]), is_admin=bool(row[1]), name=str(row[2]), password=str(row[3]), fb_id=str(row[4]))
         c.close()
 
         return result
 
-    def get_user_for_email(self, email: str) -> SystemUser:
+    def get_user_for_name(self, name: str) -> SystemUser:
         conn = DBManager().conn
         c = conn.cursor()
         result = None
-        for row in c.execute("SELECT ID, IS_ADMIN, EMAIL, PASSWORD FROM USER WHERE EMAIL = ? ORDER BY ID", [email]):
-            result = SystemUser(id=int(row[0]), is_admin=bool(row[1]), email=str(row[2]), password=str(row[3]))
+        for row in c.execute("SELECT ID, IS_ADMIN, NAME, PASSWORD, FB_ID FROM USER WHERE NAME = ? ORDER BY ID", [name]):
+            result = SystemUser(id=int(row[0]), is_admin=bool(row[1]), name=str(row[2]), password=str(row[3]), fb_id=str(row[4]))
         c.close()
 
         return result
@@ -46,15 +46,15 @@ class UserService:
 
         return result
 
-    def add_user(self, is_admin: bool, email: str, password: str) -> SystemUser:
+    def add_user(self, is_admin: bool, name: str, password: str, fb_id: str) -> SystemUser:
         db = DBManager()
         conn = db.conn
-        sql = ''' INSERT INTO USER(IS_ADMIN, EMAIL, PASSWORD)
-                  VALUES(?,?,?) '''
+        sql = ''' INSERT INTO USER(IS_ADMIN, NAME, PASSWORD, FB_ID)
+                  VALUES(?,?,?,?) '''
         c = conn.cursor()
-        c.execute(sql, (str(int(is_admin)),email,password))
+        c.execute(sql, (str(int(is_admin)),name,password, fb_id))
         conn.commit()
-        return SystemUser(id=c.lastrowid, is_admin=is_admin, email=email, password=password)
+        return SystemUser(id=c.lastrowid, is_admin=is_admin, name=name, password=password, fb_id=fb_id)
 
     def change_admin(self, user_id:int, is_admin: bool) -> bool:
         db = DBManager()
@@ -63,5 +63,15 @@ class UserService:
 
         c = conn.cursor()
         c.execute(sql, [str(int(is_admin)),user_id])
+        conn.commit()
+        return True
+
+    def delete_user(self, user_id:int) -> bool:
+        db = DBManager()
+        conn = db.conn
+        sql = 'DELETE FROM USER WHERE ID = ? '
+
+        c = conn.cursor()
+        c.execute(sql,[user_id])
         conn.commit()
         return True

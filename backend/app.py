@@ -1,5 +1,5 @@
 from typing import Optional
-
+from fastapi.security import OAuth2PasswordRequestForm
 from fastapi import FastAPI, status, HTTPException, Depends
 from fastapi.responses import RedirectResponse
 from Auth.schemas import UserAuth, TokenSchema
@@ -46,9 +46,9 @@ async def create_user(data: UserAuth):
     user = userService.add_user(is_admin,data.name,password, None)
     return user
 
+
 @app.post('/login', summary="Create access and refresh tokens for user", response_model=TokenSchema)
 async def login(username: str, fb_token: Optional[str] = None, password: Optional[str] = None):
-#async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     if not (fb_token is None):
         user = FacebookService().get_user_for_token(username, fb_token)
         if user is None:
@@ -74,9 +74,11 @@ async def login(username: str, fb_token: Optional[str] = None, password: Optiona
 
     return TokenSchema(access_token=create_access_token(user.name), refresh_token=create_refresh_token(user.name))
 
+
 @app.get('/me', summary='Get details of currently logged in user', response_model=User)
 async def get_me(user: SystemUser = Depends(get_current_user)):
    return user
+
 
 @app.get('/users', summary='Get users')
 async def get_users(user: SystemUser = Depends(get_current_user)):
@@ -84,9 +86,11 @@ async def get_users(user: SystemUser = Depends(get_current_user)):
     users = userService.get_users()
     return users
 
+
 @app.get('/user', summary='Get user')
 async def get_users(user_id: int, user: SystemUser = Depends(get_current_user)):
     return UserService().get_user_for_id(user_id)
+
 
 @app.post('/user/admin', summary="change admin")
 async def change_admin(user_id: int, is_admin: bool, user: SystemUser = Depends(get_current_user)):
@@ -97,6 +101,7 @@ async def change_admin(user_id: int, is_admin: bool, user: SystemUser = Depends(
         )
 
     return UserService().change_admin(user_id,is_admin)
+
 
 @app.delete('/user', summary="Delete user")
 async def delete_user(user_id: int, user: SystemUser = Depends(get_current_user)):
@@ -114,11 +119,13 @@ async def delete_user(user_id: int, user: SystemUser = Depends(get_current_user)
 
     return UserService().delete_user(user_id)
 
+
 @app.post('/chat', summary="Create new chat", response_model=Chat)
 async def create_chat(data: CreateChat, user: SystemUser = Depends(get_current_user)):
     chat = ChatService().add_chat(user.id,data.name)
     ChatReaderService().add_chat_reader(chat.id,user.id)
     return chat
+
 
 @app.get('/chats', summary='Get chats from logged user')
 async def get_chats(user: SystemUser = Depends(get_current_user)):
@@ -133,6 +140,7 @@ async def get_chats(user: SystemUser = Depends(get_current_user)):
         chats.append(chat)
 
     return chats
+
 
 @app.post('/chat/reader', summary="add chat reader", response_model=ChatReader)
 async def create_chat(data: ChatReader, user: SystemUser = Depends(get_current_user)):
@@ -161,6 +169,7 @@ async def create_chat(data: ChatReader, user: SystemUser = Depends(get_current_u
 
     return service.add_chat_reader(data.chat_id,data.user_id)
 
+
 @app.get('/chat/readers', summary='Get readers for chat')
 async def get_chat_readers(chat_id: int, user: SystemUser = Depends(get_current_user)):
     user_ids_in_chat = ChatReaderService().get_users_for_chat(chat_id)
@@ -173,6 +182,7 @@ async def get_chat_readers(chat_id: int, user: SystemUser = Depends(get_current_
 
     return user_ids_in_chat
 
+
 @app.get('/chat/messages', summary='Get messages for chat')
 async def get_chat_readers(chat_id: int,  take: int,  skip: int, user: SystemUser = Depends(get_current_user)):
     user_ids_in_chat = ChatReaderService().get_users_for_chat(chat_id)
@@ -184,6 +194,7 @@ async def get_chat_readers(chat_id: int,  take: int,  skip: int, user: SystemUse
             )
 
     return MessageService().get_messages_for_chat(chat_id,  take,  skip)
+
 
 @app.post('/chat/message', summary="add chat message", response_model=Message)
 async def create_chat_message(data: CreateMessage, user: SystemUser = Depends(get_current_user)):
@@ -219,7 +230,6 @@ async def create_chat_message(data: CreateMessage, user: SystemUser = Depends(ge
     return MessageService().add_message(data.chat_id, data.user_id, data.message)
 
 
-
 @app.post('/chat/message/reader', summary="add chat message reader", response_model=MessageReader)
 async def create_message_reader(data: CreateMessageReader, user: SystemUser = Depends(get_current_user)):
     message = MessageService().get_message(data.message_id)
@@ -251,6 +261,7 @@ async def create_message_reader(data: CreateMessageReader, user: SystemUser = De
             )
 
     return MessageReaderService().add_message_reader(data.message_id, data.user_id)
+
 
 @app.get('/chat/message/readers', summary='Get readers for message')
 async def get_chat_readers(message_id: int, user: SystemUser = Depends(get_current_user)):

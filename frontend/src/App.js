@@ -10,6 +10,7 @@ import ChatDetails from "./components/Chat/ChatDetails";
 import { useEffect } from "react";
 import axios from "axios";
 import { userActions } from "./store/user-slice";
+import ChatDetailsWrapper from "./components/Chat/ChatDetailsWrapper";
 
 function App() {
   const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
@@ -59,7 +60,11 @@ function App() {
           </Route>
           <Route path="/chat/:id">
             {!isLoggedIn && <Redirect to="/login" />}
-            {isLoggedIn && <ChatDetails />}
+            {isLoggedIn && (
+              <ChatDetailsWrapper>
+                <ChatDetails />
+              </ChatDetailsWrapper>
+            )}
           </Route>
         </Switch>
       </main>

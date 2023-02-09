@@ -5,6 +5,7 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 
 import "semantic-ui-css/semantic.min.css";
+import DataService from "../API/DataService";
 
 const ChatPage = () => {
   const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
@@ -15,55 +16,31 @@ const ChatPage = () => {
   const [enteredCreation, setEnteredCreation] = useState(false);
 
   useEffect(() => {
-    axios
-      .get("http://localhost:8080/chats", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then((res) => {
-        setChats(res.data);
-      });
+    DataService.getChats(token).then((res) => {
+      setChats(res.data);
+    });
   }, [token]);
 
   const handleCreation = (event) => {
     event.preventDefault();
-    const data = JSON.stringify({ name: chatName });
 
-    axios
-      .post("http://localhost:8080/chat", data, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then((res) => {
-        if (res.data) {
-          setSelected([]);
-          setEnteredCreation(false);
-          setChats((prev) => {
-            return [...prev, res.data];
-          });
-        }
+    DataService.createChat(token, chatName).then((res) => {
+      if (res.data) {
+        setSelected([]);
+        setEnteredCreation(false);
+        setChats((prev) => {
+          return [...prev, res.data];
+        });
+      }
 
-        if (Array.isArray(selected) && selected.length) {
-          const chatId = res.data.id;
+      if (!Array.isArra(selected) || !selected.length) {
+        const chatId = res.data.id;
 
-          selected.forEach((obj) => {
-            const data = JSON.stringify({
-              chat_id: chatId,
-              user_id: obj.value,
-            });
-
-            axios.post("http://localhost:8080/chat/reader", data, {
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-              },
-            });
-          });
-        }
-      });
+        selected.forEach((u) =>
+          DataService.addChatReader(token, chatId, u.value)
+        );
+      }
+    });
   };
 
   const cleanAfterCreation = () => {

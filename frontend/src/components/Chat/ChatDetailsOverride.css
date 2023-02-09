@@ -1,0 +1,4 @@
+.cs-message__sender-name,
+.cs-message__sent-time {
+  display: block !important;
+}

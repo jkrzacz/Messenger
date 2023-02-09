@@ -17,17 +17,19 @@ function App() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    axios
-      .get("http://localhost:8080/me", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then((res) => {
-        if (res.data) {
-          dispatch(userActions.setUserInfo(res.data));
-        }
-      });
+    if (isLoggedIn) {
+      axios
+        .get("http://localhost:8080/me", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((res) => {
+          if (res.data) {
+            dispatch(userActions.setUserInfo(res.data));
+          }
+        });
+    }
   }, [token, isLoggedIn, dispatch]);
 
   return (

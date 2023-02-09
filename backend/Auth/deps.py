@@ -40,7 +40,7 @@ async def get_current_user(token: str = Depends(reuseable_oauth)) -> SystemUser:
         )
 
     userService = UserService()
-    user = userService.get_user_for_email(token_data.sub)
+    user = userService.get_user_for_name(token_data.sub)
 
     if user is None:
         raise HTTPException(

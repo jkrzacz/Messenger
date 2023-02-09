@@ -20,7 +20,7 @@ const ChatCreator = (props) => {
       })
       .then((res) => {
         const users = res.data.map((user) => ({
-          label: user.email,
+          label: user.name,
           value: user.id,
         }));
         setUsers(users);

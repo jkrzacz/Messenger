@@ -4,6 +4,8 @@ import Chats from "./Chats";
 import axios from "axios";
 import { useState, useEffect } from "react";
 
+import "semantic-ui-css/semantic.min.css";
+
 const ChatPage = () => {
   const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
   const token = useSelector((state) => state.user.token);
@@ -81,6 +83,7 @@ const ChatPage = () => {
             setEnteredCreation={setEnteredCreation}
             cleanAfterCreation={cleanAfterCreation}
           />
+
           <Chats chats={chats} />
         </>
       )}

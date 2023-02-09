@@ -3,13 +3,13 @@ import classes from "./Register.module.css";
 import axios from "axios";
 
 const Auth = () => {
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
   const registrationHandler = (event) => {
     event.preventDefault();
 
-    const data = JSON.stringify({ email, password });
+    const data = JSON.stringify({ name: username, password });
 
     axios
       .post("http://localhost:8080/signup", data, {
@@ -18,8 +18,7 @@ const Auth = () => {
         },
       })
       .then((res) => {
-        console.log(res);
-        alert("Zarejestrowano użytkownika " + res.data.email);
+        alert("Registered user: " + res.data.name);
       })
       .catch((err) => console.log(err));
   };
@@ -30,11 +29,11 @@ const Auth = () => {
         <section>
           <form onSubmit={registrationHandler}>
             <div className={classes.control}>
-              <label htmlFor="email">Email</label>
+              <label htmlFor="username">Username</label>
               <input
-                type="text"
-                id="email"
-                onChange={(e) => setEmail(e.target.value)}
+                type="username"
+                id="username"
+                onChange={(e) => setUsername(e.target.value)}
               />
             </div>
             <div className={classes.control}>

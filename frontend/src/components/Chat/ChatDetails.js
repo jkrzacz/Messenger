@@ -1,4 +1,5 @@
 import styles from "@chatscope/chat-ui-kit-styles/dist/default/styles.min.css";
+import overridenStyles from "./ChatDetailsOverride.css";
 import axios from "axios";
 import {
   MainContainer,
@@ -16,6 +17,7 @@ const ChatDetails = (props) => {
   const { id } = useParams();
   const token = useSelector((state) => state.user.token);
   const currentUserId = useSelector((state) => state.user.id);
+  const currentUsername = useSelector((state) => state.user.username);
   const [messages, setMessages] = useState([]);
   const [readerIds, setReaderIds] = useState([]);
   const [allUsers, setAllUsers] = useState([]);
@@ -34,15 +36,36 @@ const ChatDetails = (props) => {
         },
       })
       .then((res) => {
+        console.log(allUsers);
         const messageList = res.data.map((msg) => {
-          const model = {
-            message: msg.message,
-            sentTime: msg.create_datetime,
-            sender: msg.user_id.toString(),
-            direction: msg.user_id === currentUserId ? 0 : 1,
-          };
+          const sender = `${
+            msg.user_id === currentUserId
+              ? currentUsername
+              : allUsers
+                  .filter((u) => +u.id === +msg.user_id)
+                  .map((u) => u.name)[0]
+          }`;
 
-          return <Message key={msg.id} model={model} />;
+          return (
+            <Message
+              key={msg.id}
+              model={{
+                message: msg.message,
+                sentTime: msg.create_datetime,
+                direction: msg.user_id === currentUserId ? 0 : 1,
+              }}
+            >
+              <Message.Header
+                style={{ display: "block !important" }}
+                sender={sender}
+                sentTime={`(${msg.create_datetime})`}
+              />
+              <Message.Footer
+                style={{ display: "block !important" }}
+                sender="wysłano"
+              />
+            </Message>
+          );
         });
 
         setMessages(messageList);
@@ -83,13 +106,12 @@ const ChatDetails = (props) => {
   useEffect(() => {
     getChatReaders();
     getUsers();
-    // setReaders(users.filter((u) => readers.include(u.id)));
-
     getMessages();
+
     const interval = setInterval(() => {
       getMessages();
       setTime(Date.now());
-    }, 1000);
+    }, 2000);
     return () => {
       clearInterval(interval);
     };
@@ -112,13 +134,16 @@ const ChatDetails = (props) => {
       .then((res) => {
         if (res.data) {
           setMessages((prev) => {
-            const model = {
-              message: res.data.message,
-              sentTime: res.data.create_datetime,
-              sender: res.data.user_id.toString(),
-              direction: 0,
-            };
-            const msg = <Message key={res.data.id} model={model} />;
+            const msg = (
+              <Message
+                key={res.data.id}
+                model={{
+                  message: res.data.message,
+                  sentTime: res.data.create_datetime,
+                  direction: 0,
+                }}
+              ></Message>
+            );
 
             return [...prev, msg];
           });
@@ -132,6 +157,7 @@ const ChatDetails = (props) => {
         <MainContainer>
           <ChatContainer>
             <MessageList>{messages}</MessageList>
+
             <MessageInput
               placeholder="Wprowadź swoją wiadomość"
               onSend={handleSendMessage}
@@ -142,7 +168,7 @@ const ChatDetails = (props) => {
           Chatters:{" "}
           {allUsers
             .filter((u) => readerIds.includes(u.id))
-            .map((u) => u.email)
+            .map((u) => u.name)
             .join(", ")}
         </div>
       </div>

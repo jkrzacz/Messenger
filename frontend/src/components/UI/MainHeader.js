@@ -40,7 +40,7 @@ const MainHeader = () => {
             {username && (
               <li>
                 <NavLink activeClassName={classes.active} to="/user-info">
-                  User: {username}
+                  {username}
                 </NavLink>
               </li>
             )}

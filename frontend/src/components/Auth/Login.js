@@ -6,50 +6,65 @@ import axios from "axios";
 import FacebookLogin from "@greatsumini/react-facebook-login";
 
 const Login = () => {
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [fbToken, setFbToken] = useState("");
+  const [fbName, setFbName] = useState("");
 
   const dispatch = useDispatch();
   const loginHandler = (event) => {
     event.preventDefault();
 
-    const form = new FormData();
-
-    form.append("username", email);
-    form.append("password", password);
-
     axios
-      .post("http://localhost:8080/login", form, {
+      .post("http://localhost:8080/login", null, {
         headers: {
           accept: "application/json",
-          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        params: {
+          username,
+          password,
         },
       })
       .then((res) => {
-        console.log(res.data);
         dispatch(userActions.login(res.data));
-      })
-      .catch((err) => console.log(err));
+      });
   };
 
   const fbHandleLoginSuccess = (event) => {
-    console.log(event);
+    setFbToken(event.accessToken);
   };
 
   const fbHandleProfileSuccess = (event) => {
-    console.log(event);
+    setFbName(event.name);
   };
+
+  if (fbName && fbToken) {
+    axios
+      .post("http://localhost:8080/login", null, {
+        headers: {
+          accept: "application/json",
+        },
+        params: {
+          username: fbName,
+          fb_token: fbToken,
+        },
+      })
+      .then((res) => {
+        dispatch(userActions.login(res.data));
+      })
+      .catch((err) => console.log(err));
+  }
 
   return (
     <main className={classes.login}>
       <section>
         <form onSubmit={loginHandler}>
           <div className={classes.control}>
-            <label htmlFor="email">Email</label>
+            <label htmlFor="username">Username</label>
             <input
               type="text"
-              id="email"
-              onChange={(e) => setEmail(e.target.value)}
+              id="username"
+              onChange={(e) => setUsername(e.target.value)}
             />
           </div>
           <div className={classes.control}>

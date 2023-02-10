@@ -1,7 +1,6 @@
 import { useSelector } from "react-redux";
-import ChatCreator from "./ChatCreator";
-import Chats from "./Chats";
-import axios from "axios";
+import ChatCreator from "../Chat/ChatCreator";
+import Chats from "../Chat/Chats";
 import { useState, useEffect } from "react";
 
 import "semantic-ui-css/semantic.min.css";
@@ -15,10 +14,14 @@ const ChatPage = () => {
   const [selected, setSelected] = useState(null);
   const [enteredCreation, setEnteredCreation] = useState(false);
 
-  useEffect(() => {
+  const getChats = () => {
     DataService.getChats(token).then((res) => {
       setChats(res.data);
     });
+  };
+
+  useEffect(() => {
+    getChats();
   }, [token]);
 
   const handleCreation = (event) => {
@@ -46,6 +49,20 @@ const ChatPage = () => {
   const cleanAfterCreation = () => {
     setEnteredCreation(!enteredCreation);
   };
+
+  const [time, setTime] = useState(Date.now());
+  // Fetch messages every 5 seconds
+  useEffect(() => {
+    getChats();
+
+    const interval = setInterval(() => {
+      getChats();
+      setTime(Date.now());
+    }, 5000);
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
 
   return (
     <main>

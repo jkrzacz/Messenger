@@ -8,22 +8,21 @@ import {
   MessageInput,
   ConversationHeader,
 } from "@chatscope/chat-ui-kit-react";
-import { useParams } from "react-router";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
 import DataService from "../API/DataService";
 import MessagesUtil from "./MessageUtil";
 
-const ChatDetails = ({ readerIdNameMap, token, chatName }) => {
-  // chat ID
-  const { id } = useParams();
-  // console.log(chats);
-  const currentUserId = useSelector((state) => state.user.id);
-
+const ChatDetails = ({
+  readerIdNameMap,
+  token,
+  chatName,
+  currentUserId,
+  chatId,
+}) => {
   const [messages, setMessages] = useState([]);
 
   const getMessages = () => {
-    DataService.getMessages(token, id).then((res) => {
+    DataService.getMessages(token, chatId).then((res) => {
       const messageList = MessagesUtil.mapMessageResponse(
         res.data,
         readerIdNameMap,
@@ -49,21 +48,22 @@ const ChatDetails = ({ readerIdNameMap, token, chatName }) => {
   }, []);
 
   const handleSendMessage = (message) => {
-    DataService.sendMessage(token, id, currentUserId, message).then((res) => {
-      if (res.data) {
-        setMessages((prev) => {
-          const msg = MessagesUtil.mapSendMessageResponse(
-            res.data,
-            readerIdNameMap,
-            currentUserId
-          );
-          return [...prev, msg];
-        });
+    DataService.sendMessage(token, chatId, currentUserId, message).then(
+      (res) => {
+        if (res.data) {
+          setMessages((prev) => {
+            const msg = MessagesUtil.mapSendMessageResponse(
+              res.data,
+              readerIdNameMap,
+              currentUserId
+            );
+            return [...prev, msg];
+          });
+        }
       }
-    });
+    );
   };
-  // console.log(id);
-  // console.log(chatsIdNameMap);
+
   return (
     <main>
       <div style={{ position: "relative", height: "800px" }}>

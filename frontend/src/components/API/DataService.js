@@ -8,6 +8,7 @@ const DataService = {
       },
     });
   },
+
   getMessages: (token, chatId) => {
     return API.get("/chat/messages", {
       headers: {
@@ -20,6 +21,7 @@ const DataService = {
       },
     });
   },
+
   getChatReaders: (token, chatId) => {
     return API.get("/chat/readers", {
       headers: {
@@ -30,6 +32,7 @@ const DataService = {
       },
     });
   },
+
   sendMessage: (token, chatId, messageSender, message) => {
     const data = JSON.stringify({
       chat_id: chatId,
@@ -55,6 +58,7 @@ const DataService = {
       },
     });
   },
+
   getChats: (token) => {
     return API.get("/chats", {
       headers: {
@@ -62,6 +66,7 @@ const DataService = {
       },
     });
   },
+
   createChat: (token, chatName) => {
     const data = JSON.stringify({ name: chatName });
     return API.post("/chat", data, {
@@ -71,6 +76,7 @@ const DataService = {
       },
     });
   },
+
   addChatReader: (token, chatId, userId) => {
     const data = JSON.stringify({
       chat_id: chatId,
@@ -81,6 +87,29 @@ const DataService = {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
+      },
+    });
+  },
+
+  deleteUser: (token, userId) => {
+    return API.delete("/user", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: {
+        user_id: userId,
+      },
+    });
+  },
+
+  changeAdmin: (token, userId, isAdmin) => {
+    return API.post("/user/admin", null, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: {
+        user_id: userId,
+        is_admin: isAdmin,
       },
     });
   },

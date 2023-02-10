@@ -1,12 +1,22 @@
 import { useSelector } from "react-redux";
 
+import classes from "./UserDetails.module.css";
+
 const UserDetails = () => {
   const { id, username } = useSelector((state) => state.user);
 
   return (
     <main>
-      {username && <div>{username}</div>}
-      {id && <div>{id}</div>}
+      <form className={classes["info-form"]}>
+        <div>
+          <label>Username</label>
+          <input type="text" id="username" disabled value={username} />
+        </div>
+        <div>
+          <label>ID</label>
+          <input type="text" id="id" disabled value={id} />
+        </div>
+      </form>
     </main>
   );
 };

@@ -1,19 +1,20 @@
 import "./App.css";
-import { Redirect, Route, Switch } from "react-router-dom";
+import { NavLink, Redirect, Route, Switch } from "react-router-dom";
 import Login from "./components/Auth/Login";
 import Register from "./components/Auth/Register";
 import { useDispatch, useSelector } from "react-redux";
-import MainHeader from "./components/UI/MainHeader";
-import ChatPage from "./components/Chat/ChatPage";
+import MainHeader from "./components/UI/MainHeaderPage";
+import ChatPage from "./components/UI/ChatPage";
 import UserDetails from "./components/Chat/UserDetails";
-import ChatDetails from "./components/Chat/ChatDetails";
 import { useEffect } from "react";
 import axios from "axios";
 import { userActions } from "./store/user-slice";
-import ChatDetailsWrapper from "./components/Chat/ChatDetailsWrapper";
+import ChatDetailsWrapper from "./components/Wrappers/ChatDetailsWrapper";
+import AdminPanel from "./components/UI/AdminPanel";
 
 function App() {
   const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
+  const isAdmin = useSelector((state) => state.user.isAdmin);
   const token = useSelector((state) => state.user.token);
   const dispatch = useDispatch();
 
@@ -60,16 +61,24 @@ function App() {
           </Route>
           <Route path="/chat/:id">
             {!isLoggedIn && <Redirect to="/login" />}
-            {isLoggedIn && (
-              <ChatDetailsWrapper>
-                <ChatDetails />
-              </ChatDetailsWrapper>
-            )}
+            {isLoggedIn && <ChatDetailsWrapper />}
           </Route>
+          <Route path="/admin-panel">
+            {(!isLoggedIn || !isAdmin) && <Redirect to="/login" />}
+            {isLoggedIn && isAdmin && <AdminPanel />}
+          </Route>
+          <Route component={NotFound} />
         </Switch>
       </main>
     </>
   );
 }
+
+const NotFound = () => (
+  <div style={{ textAlign: "center", marginTop: "10%", fontSize: "20px" }}>
+    <h1>404 - Not Found!</h1>
+    <NavLink to="/">GO HOME</NavLink>
+  </div>
+);
 
 export default App;

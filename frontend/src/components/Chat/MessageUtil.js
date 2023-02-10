@@ -5,6 +5,12 @@ const MessagesUtil = {
     return data.map((msg) => {
       const sender = readerIdNameMap.get(msg.user_id);
 
+      const readers = msg.message_readers
+        .map((r) => readerIdNameMap.get(r.user_id))
+        .join(", ");
+
+      const readByFooterText = readers ? `Read by: ${readers}` : "Sent";
+
       return (
         <Message
           key={msg.id}
@@ -21,7 +27,7 @@ const MessagesUtil = {
           />
           <Message.Footer
             style={{ display: "block !important" }}
-            sender="wysłano"
+            sender={readByFooterText}
           />
         </Message>
       );

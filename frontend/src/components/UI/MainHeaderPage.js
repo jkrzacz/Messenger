@@ -2,10 +2,11 @@ import { NavLink } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { userActions } from "../../store/user-slice";
 
-import classes from "./MainHeader.module.css";
+import classes from "./MainHeaderPage.module.css";
 
 const MainHeader = () => {
   const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
+  const isAdmin = useSelector((state) => state.user.isAdmin);
 
   const dispatch = useDispatch();
 
@@ -40,7 +41,7 @@ const MainHeader = () => {
             {username && (
               <li>
                 <NavLink activeClassName={classes.active} to="/user-info">
-                  {username}
+                  Info
                 </NavLink>
               </li>
             )}
@@ -53,6 +54,13 @@ const MainHeader = () => {
                 Logout
               </NavLink>
             </li>
+            {isAdmin && (
+              <li>
+                <NavLink activeClassName={classes.active} to="/admin-panel">
+                  ADMIN PANEL
+                </NavLink>
+              </li>
+            )}
           </ul>
         )}
       </nav>

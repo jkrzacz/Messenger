@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import ChatDetails from "./ChatDetails";
+import ChatDetails from "../Chat/ChatDetails";
 import DataService from "../API/DataService";
 import { useParams } from "react-router-dom";
 
 const ChatDetailsWrapper = () => {
   const { id } = useParams();
+  const currentUserId = useSelector((state) => state.user.id);
   const token = useSelector((state) => state.user.token);
 
   const [allUsers, setAllUsers] = useState([]);
@@ -32,9 +33,6 @@ const ChatDetailsWrapper = () => {
 
   useEffect(() => {
     if (!Array.isArray(allUsers) || !allUsers.length) {
-      DataService.getMessageReaders(token, 47).then((res) => {
-        console.log(res.data);
-      });
       return;
     }
 
@@ -50,12 +48,14 @@ const ChatDetailsWrapper = () => {
     setChatName(chats.filter((c) => +c.id === +id)[0].name);
   }, [allUsers, readerIds, chats, token, id]);
 
-  if (readerIdNameMap && chatName) {
+  if (readerIdNameMap && chatName != null) {
     return (
       <ChatDetails
+        currentUserId={currentUserId}
         readerIdNameMap={readerIdNameMap}
         token={token}
         chatName={chatName}
+        chatId={id}
       />
     );
   } else {

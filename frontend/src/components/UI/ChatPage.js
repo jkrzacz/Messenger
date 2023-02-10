@@ -36,7 +36,7 @@ const ChatPage = () => {
         });
       }
 
-      if (!Array.isArra(selected) || !selected.length) {
+      if (!Array.isArray(selected) || !selected.length) {
         const chatId = res.data.id;
 
         selected.forEach((u) =>

@@ -5,12 +5,12 @@ import Register from "./components/Auth/Register";
 import { useDispatch, useSelector } from "react-redux";
 import MainHeader from "./components/UI/MainHeaderPage";
 import ChatPage from "./components/UI/ChatPage";
-import UserDetails from "./components/Chat/UserDetails";
+import UserDetails from "./components/User/UserDetails";
 import { useEffect } from "react";
-import axios from "axios";
 import { userActions } from "./store/user-slice";
 import ChatDetailsWrapper from "./components/Wrappers/ChatDetailsWrapper";
 import AdminPanel from "./components/UI/AdminPanel";
+import DataService from "./components/API/DataService";
 
 function App() {
   const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
@@ -20,17 +20,11 @@ function App() {
 
   useEffect(() => {
     if (isLoggedIn) {
-      axios
-        .get("http://localhost:8080/me", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
-        .then((res) => {
-          if (res.data) {
-            dispatch(userActions.setUserInfo(res.data));
-          }
-        });
+      DataService.me(token).then((res) => {
+        if (res.data) {
+          dispatch(userActions.setUserInfo(res.data));
+        }
+      });
     }
   }, [token, isLoggedIn, dispatch]);
 

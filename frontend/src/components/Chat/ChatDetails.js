@@ -45,7 +45,7 @@ const ChatDetails = ({
     return () => {
       clearInterval(interval);
     };
-  }, []);
+  }, [getMessages]);
 
   const handleSendMessage = (message) => {
     DataService.sendMessage(token, chatId, currentUserId, message).then(

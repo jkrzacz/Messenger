@@ -1,6 +1,6 @@
 import { useState } from "react";
 import classes from "./Register.module.css";
-import axios from "axios";
+import DataService from "../API/DataService";
 
 const Auth = () => {
   const [username, setUsername] = useState("");
@@ -9,14 +9,7 @@ const Auth = () => {
   const registrationHandler = (event) => {
     event.preventDefault();
 
-    const data = JSON.stringify({ name: username, password });
-
-    axios
-      .post("http://localhost:8080/signup", data, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
+    DataService.register(username, password)
       .then((res) => {
         alert("Registered user: " + res.data.name);
       })

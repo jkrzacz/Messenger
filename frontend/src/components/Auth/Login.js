@@ -2,8 +2,8 @@ import { useDispatch } from "react-redux";
 import { useState } from "react";
 import { userActions } from "../../store/user-slice";
 import classes from "./Login.module.css";
-import axios from "axios";
 import FacebookLogin from "@greatsumini/react-facebook-login";
+import DataService from "../API/DataService";
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -15,19 +15,9 @@ const Login = () => {
   const loginHandler = (event) => {
     event.preventDefault();
 
-    axios
-      .post("http://localhost:8080/login", null, {
-        headers: {
-          accept: "application/json",
-        },
-        params: {
-          username,
-          password,
-        },
-      })
-      .then((res) => {
-        dispatch(userActions.login(res.data));
-      });
+    DataService.loginWithBasicAuth(username, password).then((res) => {
+      dispatch(userActions.login(res.data));
+    });
   };
 
   const fbHandleLoginSuccess = (event) => {
@@ -39,16 +29,7 @@ const Login = () => {
   };
 
   if (fbName && fbToken) {
-    axios
-      .post("http://localhost:8080/login", null, {
-        headers: {
-          accept: "application/json",
-        },
-        params: {
-          username: fbName,
-          fb_token: fbToken,
-        },
-      })
+    DataService.loginWithFacebook(fbName, fbToken)
       .then((res) => {
         dispatch(userActions.login(res.data));
       })

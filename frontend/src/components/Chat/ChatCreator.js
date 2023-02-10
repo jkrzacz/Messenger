@@ -1,8 +1,8 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
 
 import { useSelector } from "react-redux";
 import Select from "react-select";
+import DataService from "../API/DataService";
 import classes from "./Chat.module.css";
 
 const ChatCreator = (props) => {
@@ -12,19 +12,13 @@ const ChatCreator = (props) => {
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
-    axios
-      .get("http://localhost:8080/users", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then((res) => {
-        const users = res.data.map((user) => ({
-          label: user.name,
-          value: user.id,
-        }));
-        setUsers(users);
-      });
+    DataService.getAllUsers(token).then((res) => {
+      const users = res.data.map((user) => ({
+        label: user.name,
+        value: user.id,
+      }));
+      setUsers(users);
+    });
   }, [token]);
 
   return (

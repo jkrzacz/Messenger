@@ -18,6 +18,7 @@ const ChatDetails = ({
   chatName,
   currentUserId,
   chatId,
+  readerIds,
 }) => {
   const [messages, setMessages] = useState([]);
 
@@ -80,7 +81,7 @@ const ChatDetails = ({
           </ChatContainer>
         </MainContainer>
         <div>
-          Chatters: {Array.from(readerIdNameMap.values()).flat().join(", ")}
+          Chatters: {readerIds.map((r) => readerIdNameMap.get(r)).join(", ")}
         </div>
       </div>
     </main>

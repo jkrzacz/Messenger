@@ -43,7 +43,7 @@ const ChatDetailsWrapper = () => {
     if (!Array.isArray(chats) || !chats.length) {
       return;
     }
-
+    console.log(readerIds);
     setReaderIdNameMap(new Map(allUsers.map((u) => [u.id, u.name])));
     setChatName(chats.filter((c) => +c.id === +id)[0].name);
   }, [allUsers, readerIds, chats, token, id]);
@@ -53,6 +53,7 @@ const ChatDetailsWrapper = () => {
       <ChatDetails
         currentUserId={currentUserId}
         readerIdNameMap={readerIdNameMap}
+        readerIds={readerIds}
         token={token}
         chatName={chatName}
         chatId={id}

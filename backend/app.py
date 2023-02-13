@@ -22,9 +22,18 @@ from Models.Chat import CreateChat, Chat
 from Models.ChatReader import ChatReader
 from Models.Message import CreateMessage, Message
 from Models.MessageReader import CreateMessageReader, MessageReader
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
+origins = ["http://localhost:3000"]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get('/', response_class=RedirectResponse, include_in_schema=False)
 async def docs():
@@ -92,16 +101,6 @@ async def get_users(user_id: int, user: SystemUser = Depends(get_current_user)):
     return UserService().get_user_for_id(user_id)
 
 
-@app.post('/user/admin', summary="change admin")
-async def change_admin(user_id: int, is_admin: bool, user: SystemUser = Depends(get_current_user)):
-    if user.is_admin == False:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="You are not admin"
-        )
-
-    return UserService().change_admin(user_id,is_admin)
-
 
 @app.delete('/user', summary="Delete user")
 async def delete_user(user_id: int, user: SystemUser = Depends(get_current_user)):
@@ -119,6 +118,15 @@ async def delete_user(user_id: int, user: SystemUser = Depends(get_current_user)
 
     return UserService().delete_user(user_id)
 
+@app.post('/user/admin', summary="change admin")
+async def change_admin(user_id: int, is_admin: bool, user: SystemUser = Depends(get_current_user)):
+    if user.is_admin == False:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="You are not admin"
+        )
+
+    return UserService().change_admin(user_id,is_admin)
 
 @app.post('/chat', summary="Create new chat", response_model=Chat)
 async def create_chat(data: CreateChat, user: SystemUser = Depends(get_current_user)):
@@ -183,7 +191,7 @@ async def get_chat_readers(chat_id: int, user: SystemUser = Depends(get_current_
     return user_ids_in_chat
 
 
-@app.get('/chat/messages', summary='Get messages for chat')
+@app.get('/chat/messages', summary='Get messages for chat, set as read for user requesting messages')
 async def get_chat_readers(chat_id: int,  take: int,  skip: int, user: SystemUser = Depends(get_current_user)):
     user_ids_in_chat = ChatReaderService().get_users_for_chat(chat_id)
     if not user.id in user_ids_in_chat:
@@ -193,7 +201,7 @@ async def get_chat_readers(chat_id: int,  take: int,  skip: int, user: SystemUse
                 detail="Chat not found"
             )
 
-    return MessageService().get_messages_for_chat(chat_id,  take,  skip)
+    return MessageService().get_messages_for_chat(chat_id, user.id, take, skip)
 
 
 @app.post('/chat/message', summary="add chat message", response_model=Message)

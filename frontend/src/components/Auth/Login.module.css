@@ -1,0 +1,48 @@
+.login {
+  margin: 5rem auto;
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.2);
+  width: 25rem;
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+  background-color: #92a6dfc2;
+}
+
+.control {
+  margin-bottom: 0.5rem;
+}
+
+.control label {
+  display: block;
+  color: whitesmoke;
+  font-weight: bold;
+  font-size: 14px;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+.control input {
+  display: block;
+  width: 20rem;
+  margin: auto;
+  border-radius: 4px;
+  padding: 0.25rem;
+  border: 1px solid #ccc;
+}
+
+.login-buttons {
+  display: flex;
+  justify-content: center;
+}
+
+.login-buttons button {
+  cursor: pointer;
+  color: whitesmoke;
+  font-size: 12px;
+  flex: 0.1 0 35%;
+  background: #3e40a3b9;
+  border: 1px solid #5c5858;
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  margin: 2% 3% 1% 3%;
+}

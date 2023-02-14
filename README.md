@@ -18,12 +18,18 @@ Główne funkcjonalności aplikacji to:
 ### Logowanie/Rejestracja użytkownika
 1. Wejdź na stronę domową aplikacji (http://localhost:3000)
 2. Zostaniesz przekierowany na stronę logowania tj. (http://localhost:3000/login) (jeśli masz już konto, pomiń kroki 3,4,5)
+
 ![image](https://user-images.githubusercontent.com/34356490/218802790-12a46ac2-ca1d-4629-bb76-d3a8549d6ea7.png)
+
 3. W nagłówku strony kliknij w przycisk 'Register', aby przejść do strony rejestrowania nowego użytkownika
+
 ![image](https://user-images.githubusercontent.com/34356490/218802961-a3731ebb-638a-4836-ae83-fe02bc6e5d61.png)
+
 4. Zarejestruj użytkownika wpisując wybraną nazwę użytkownika oraz hasło
 5. Jeśli nazwa jest dostępna, a hasło posiada ponad 5 znaków, pomyślną rejestrację zakończy wyświetlony alert.
+
 ![image](https://user-images.githubusercontent.com/34356490/218803251-91d9b10a-bc38-4f2f-9606-43a82522c6f9.png)
+
 6. Na stronie http://localhost:3000/login wprowadź nazwę i hasło użytkownika lub zaloguj się za pomocą konta facebook wykorzystując przycisk 'Login with Facebook'
 
 ### Tworzenie czatu

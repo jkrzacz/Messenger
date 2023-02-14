@@ -68,7 +68,7 @@ Główne funkcjonalności aplikacji to:
 6. Administrator może usunąć konto wybranego użytkownika
 
 ### Zakładka Info
-1. Zakładka info wyświetla dostępne informacje o użytkowniku w formie tabelki
+1. Zakładka info (http://localhost:3000/user-info) wyświetla dostępne informacje o użytkowniku w formie tabelki
 
 ![image](https://user-images.githubusercontent.com/34356490/218805667-7830049e-a229-413a-ab43-461b00f6b650.png)
 

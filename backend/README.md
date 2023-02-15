@@ -2,7 +2,7 @@
 
 ## Opis aplikacji
 
-Ta część aplikacji odpowiada za backend. Obsługuje pełną funkcjonalność komunikatora wiadomości.
+Ta część aplikacji odpowiada za backend, napisany w języku Python. Obsługuje pełną funkcjonalność komunikatora wiadomości.
 
 ## Wymagania
 

@@ -2,7 +2,8 @@
 
 ## Opis aplikacji
 
-Ta część aplikacji odpowiada za frontend. Umożliwia komunikowanie się z backendem w celu uzyskania pełnej funkcjonalności komunikatora wiadomości.
+Ta część aplikacji odpowiada za frontend, który został napisany w języku React. 
+Umożliwia komunikowanie się z backendem w celu uzyskania pełnej funkcjonalności komunikatora wiadomości.
 
 ## Wymagania
 

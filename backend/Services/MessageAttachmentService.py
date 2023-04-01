@@ -23,7 +23,7 @@ class MessageAttachmentService:
         c = conn.cursor()
         c.execute(sql, (message_id, type, attachment))
         conn.commit()
-        return MessageAttachment(message_id=message_id, type=type, attachment=attachment)
+        return MessageAttachment(id=c.lastrowid, message_id=message_id, type=type, attachment=attachment)
 
     def delete_message_attachments_for_message(self, message_id:int) -> bool:
         db = DBManager()

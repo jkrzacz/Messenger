@@ -10,6 +10,7 @@ class Message(BaseModel):
     create_datetime: datetime
     message : str
     message_readers: Optional[list]
+    message_attachments: Optional[list]
 
 class CreateMessage(BaseModel):
     chat_id: int

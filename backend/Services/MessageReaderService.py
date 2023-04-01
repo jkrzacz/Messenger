@@ -31,3 +31,13 @@ class MessageReaderService:
         c.execute(sql, (message_id, user_id, read_datetime))
         conn.commit()
         return MessageReader(message_id=message_id, user_id=user_id, read_datetime=read_datetime)
+
+    def delete_message_readers_for_message(self, message_id: int) -> bool:
+        db = DBManager()
+        conn = db.conn
+        sql = 'DELETE FROM MESSAGE_READER WHERE MESSAGE_ID = ? '
+
+        c = conn.cursor()
+        c.execute(sql, [message_id])
+        conn.commit()
+        return True

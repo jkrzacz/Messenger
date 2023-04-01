@@ -16,12 +16,14 @@ from Services.MessageService import MessageService
 from Services.ChatReaderService import ChatReaderService
 from Services.MessageReaderService import MessageReaderService
 from Services.FacebookService import FacebookService
+from Services.MessageAttachmentService import MessageAttachmentService
 
 from Models.User import User, SystemUser
 from Models.Chat import CreateChat, Chat
 from Models.ChatReader import ChatReader
 from Models.Message import CreateMessage, Message
 from Models.MessageReader import CreateMessageReader, MessageReader
+from Models.MessageAttachment import CreateMessageAttachment, MessageAttachment
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
@@ -220,7 +222,6 @@ async def create_chat_message(data: CreateMessage, user: SystemUser = Depends(ge
             detail="User not found"
         )
 
-    service = ChatReaderService()
     user_ids_in_chat = ChatReaderService().get_users_for_chat(data.chat_id)
     if user.is_admin == False:
         if not user.id in user_ids_in_chat:
@@ -237,6 +238,24 @@ async def create_chat_message(data: CreateMessage, user: SystemUser = Depends(ge
 
     return MessageService().add_message(data.chat_id, data.user_id, data.message)
 
+@app.delete('/chat/message', summary="Delete chat message")
+async def delete_message(message_id: int, user: SystemUser = Depends(get_current_user)):
+    messageService = MessageService()
+    message = messageService.get_message(message_id)
+    if message is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="message not found"
+        )
+
+    if user.is_admin == False:
+        if user.id != message.user_id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="You can only delete yours message"
+            )
+
+    return messageService.delete_message(message_id)
 
 @app.post('/chat/message/reader', summary="add chat message reader", response_model=MessageReader)
 async def create_message_reader(data: CreateMessageReader, user: SystemUser = Depends(get_current_user)):
@@ -289,3 +308,48 @@ async def get_chat_readers(message_id: int, user: SystemUser = Depends(get_curre
             )
 
     return MessageReaderService().get_message_readers_for_message(message_id)
+
+@app.get('/chat/message/attachments', summary='Get attachments for message')
+async def get_message_attachments(message_id: int, user: SystemUser = Depends(get_current_user)):
+    message = MessageService().get_message(message_id)
+    if message is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Message not found"
+        )
+
+    user_ids_in_chat = ChatReaderService().get_users_for_chat(message.chat_id)
+    if not user.id in user_ids_in_chat:
+        if user.is_admin == False:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Chat not found"
+            )
+
+    return MessageAttachmentService().get_message_attachments_for_message(message_id)
+
+@app.post('/chat/message/attachment', summary="add chat message attachment", response_model=MessageAttachment)
+async def create_message_attachment(data: CreateMessageAttachment, user: SystemUser = Depends(get_current_user)):
+    message = MessageService().get_message(data.message_id)
+    if message is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Message not found"
+        )
+
+    if user.is_admin == False:
+        user_ids_in_chat = ChatReaderService().get_users_for_chat(message.chat_id)
+
+        if not user.id in user_ids_in_chat:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Chat not found"
+            )
+
+        if user.id != message.user_id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="you cant add attachment for other users"
+            )
+
+    return MessageAttachmentService().add_message_attachment(data.message_id, data.type, data.attachment)

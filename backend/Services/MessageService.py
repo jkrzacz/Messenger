@@ -3,6 +3,7 @@ import time
 from Models.Message import Message
 from DBManager import DBManager
 from Services.MessageReaderService import MessageReaderService
+from Services.MessageAttachmentService import MessageAttachmentService
 import sqlite3
 
 class MessageService:
@@ -16,11 +17,12 @@ class MessageService:
             create_datetime = datetime.fromtimestamp(int(row[3]))
             message_id = int(row[0])
             message_readers = messageReaderService.get_message_readers_for_message(message_id)
+            message_attachments = MessageAttachmentService().get_message_attachments_for_message(message_id)
             message_sender_id = int(row[2])
             if (not any(x.user_id == user_id for x in message_readers) and user_id != message_sender_id):
                 messageReaderService.add_message_reader(message_id, user_id)
 
-            result.append(Message(id=message_id, chat_id=int(row[1]), user_id=int(row[2]), create_datetime=create_datetime,message=str(row[4]), message_readers=message_readers))
+            result.append(Message(id=message_id, chat_id=int(row[1]), user_id=int(row[2]), create_datetime=create_datetime,message=str(row[4]), message_readers=message_readers, message_attachments=message_attachments))
         c.close()
 
         return list(result)
@@ -34,7 +36,8 @@ class MessageService:
             create_datetime = datetime.fromtimestamp(int(row[3]))
             message_id = int(row[0])
             message_readers = messageReaderService.get_message_readers_for_message(message_id)
-            result = Message(id=message_id, chat_id=int(row[1]), user_id=int(row[2]), create_datetime=create_datetime,message=str(row[4]), message_readers=message_readers)
+            message_attachments = MessageAttachmentService().get_message_attachments_for_message(message_id)
+            result = Message(id=message_id, chat_id=int(row[1]), user_id=int(row[2]), create_datetime=create_datetime,message=str(row[4]), message_readers=message_readers, message_attachments=message_attachments)
 
         c.close()
 
@@ -43,8 +46,6 @@ class MessageService:
     def add_message(self, chat_id: int, user_id: int, message: str):
         db = DBManager()
         conn = db.conn
-        c = conn.cursor()
-
         sql = ''' INSERT INTO MESSAGE(CHAT_ID,USER_ID,CREATE_DATETIME,MESSAGE)
                   VALUES(?,?,?,?) '''
         c = conn.cursor()
@@ -52,3 +53,17 @@ class MessageService:
         c.execute(sql, (chat_id, user_id, create_datetime, message))
         conn.commit()
         return Message(id=c.lastrowid, chat_id=chat_id, user_id=user_id, create_datetime=create_datetime,message=message)
+
+    def delete_message(self, message_id:int) -> bool:
+        db = DBManager()
+        conn = db.conn
+        sql = 'DELETE FROM MESSAGE WHERE ID = ? '
+
+        c = conn.cursor()
+        c.execute(sql, [message_id])
+        conn.commit()
+
+        MessageAttachmentService().delete_message_attachments_for_message(message_id)
+        MessageReaderService().delete_message_readers_for_message(message_id)
+
+        return True

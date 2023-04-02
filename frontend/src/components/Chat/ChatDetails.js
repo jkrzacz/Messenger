@@ -22,21 +22,21 @@ const ChatDetails = ({
 }) => {
   const [messages, setMessages] = useState([]);
 
-  const getMessages = () => {
-    DataService.getMessages(token, chatId).then((res) => {
-      const messageList = MessagesUtil.mapMessageResponse(
-        res.data,
-        readerIdNameMap,
-        currentUserId
-      );
-
-      setMessages(messageList);
-    });
-  };
-
   const [time, setTime] = useState(Date.now());
   // Fetch messages every 2 seconds
   useEffect(() => {
+    const getMessages = () => {
+      DataService.getMessages(token, chatId).then((res) => {
+        const messageList = MessagesUtil.mapMessageResponse(
+          res.data,
+          readerIdNameMap,
+          currentUserId
+        );
+
+        setMessages(messageList);
+      });
+    };
+
     getMessages();
 
     const interval = setInterval(() => {
@@ -46,7 +46,7 @@ const ChatDetails = ({
     return () => {
       clearInterval(interval);
     };
-  }, [getMessages]);
+  }, []);
 
   const handleSendMessage = (message) => {
     DataService.sendMessage(token, chatId, currentUserId, message).then(

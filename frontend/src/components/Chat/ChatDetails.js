@@ -8,7 +8,7 @@ import {
   MessageInput,
   ConversationHeader,
 } from "@chatscope/chat-ui-kit-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import DataService from "../API/DataService";
 import MessagesUtil from "./MessageUtil";
 
@@ -21,8 +21,10 @@ const ChatDetails = ({
   readerIds,
 }) => {
   const [messages, setMessages] = useState([]);
+  const fileRef = useRef(null);
+  const [base64String, setBase64String] = useState(null);
+  const [fileName, setFileName] = useState(null);
 
-  const [time, setTime] = useState(Date.now());
   // Fetch messages every 2 seconds
   useEffect(() => {
     const getMessages = () => {
@@ -41,7 +43,6 @@ const ChatDetails = ({
 
     const interval = setInterval(() => {
       getMessages();
-      setTime(Date.now());
     }, 2000);
     return () => {
       clearInterval(interval);
@@ -60,9 +61,36 @@ const ChatDetails = ({
             );
             return [...prev, msg];
           });
+
+          if (base64String) {
+            DataService.sendAttachment(
+              token,
+              res.data.id,
+              base64String.split("base64,")[0],
+              base64String
+            );
+          }
+
+          setFileName(null);
+          setBase64String(null);
         }
       }
     );
+  };
+
+  // funkcja obsługująca wybór pliku graficznego
+  const handleFileSelect = (event) => {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+    reader.onload = handleFileLoad;
+    reader.readAsDataURL(file);
+    setFileName(file.name);
+  };
+
+  // funkcja obsługująca przetworzenie pliku graficznego
+  const handleFileLoad = (event) => {
+    const encodedString = event.target.result;
+    setBase64String(encodedString);
   };
 
   return (
@@ -77,12 +105,33 @@ const ChatDetails = ({
             <MessageInput
               placeholder="Wprowadź swoją wiadomość"
               onSend={handleSendMessage}
-            />
+              onAttachClick={() => fileRef.current.click()}
+            ></MessageInput>
           </ChatContainer>
+          <input
+            type="file"
+            id="file"
+            onChange={handleFileSelect}
+            ref={fileRef}
+            style={{ display: "none" }}
+          />
         </MainContainer>
         <div>
           Chatters: {readerIds.map((r) => readerIdNameMap.get(r)).join(", ")}
         </div>
+        <div>Attached file: {fileName}</div>
+        {fileName && (
+          <img
+            src={base64String}
+            alt=""
+            width={100}
+            height={100}
+            onClick={() => {
+              setBase64String(null);
+              setFileName(null);
+            }}
+          />
+        )}
       </div>
     </main>
   );

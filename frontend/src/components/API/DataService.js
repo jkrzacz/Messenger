@@ -90,6 +90,21 @@ const DataService = {
     });
   },
 
+  sendAttachment: (token, messageId, type, attachment) => {
+    const data = JSON.stringify({
+      message_id: messageId,
+      type: type,
+      attachment: attachment,
+    });
+
+    return API.post("/chat/message/attachment", data, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  },
+
   getMessageReaders: (token, messageId) => {
     return API.get("/chat/message/readers", {
       headers: {

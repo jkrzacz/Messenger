@@ -1,4 +1,4 @@
-import { Message } from "@chatscope/chat-ui-kit-react";
+import { Message, MessageImageContent } from "@chatscope/chat-ui-kit-react";
 
 const MessagesUtil = {
   mapMessageResponse: (data, readerIdNameMap, currentUserId) => {
@@ -11,6 +11,11 @@ const MessagesUtil = {
 
       const readByFooterText = readers ? `Read by: ${readers}` : "Sent";
 
+      const attachements = msg.message_attachments;
+
+      const isAttachement =
+        typeof attachements !== "undefined" && attachements.length > 0;
+
       return (
         <Message
           key={msg.id}
@@ -20,6 +25,17 @@ const MessagesUtil = {
             direction: msg.user_id === currentUserId ? 0 : 1,
           }}
         >
+          {isAttachement && (
+            <Message.CustomContent>
+              <p>{msg.message}</p>
+              <img
+                alt={msg.message}
+                src={attachements[0].attachment}
+                width={300}
+                height={300}
+              />
+            </Message.CustomContent>
+          )}
           <Message.Header
             style={{ display: "block !important" }}
             sender={sender}
